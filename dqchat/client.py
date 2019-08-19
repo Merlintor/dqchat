@@ -21,7 +21,7 @@ class Client(Session):
     def send_message(self, user_id, content):
         try:
             resp = self.post("%s://%s.onion/messages" % (self.scheme, user_id), timeout=10, data={
-                "user_id": self.app.user_id,
+                "author": self.app.user_id,
                 "token": self.app.token,
                 "content": content
             })

@@ -1,4 +1,4 @@
-from requests import Session, Timeout
+from requests import Session, Timeout, ConnectionError
 
 
 class Client(Session):
@@ -15,7 +15,7 @@ class Client(Session):
         try:
             resp = self.get("%s://%s.onion/status" % (self.scheme, user_id), timeout=10)
             return resp.status_code == 200
-        except Timeout:
+        except (Timeout, ConnectionError):
             return False
 
     def send_message(self, user_id, content):
@@ -26,7 +26,7 @@ class Client(Session):
                 "content": content
             })
             return resp.status_code == 200
-        except Timeout:
+        except (Timeout, ConnectionError):
             return False
 
     def verify_message(self, user_id, token):
@@ -35,5 +35,5 @@ class Client(Session):
                 "token": token
             })
             return resp.status_code == 200
-        except Timeout:
+        except (Timeout, ConnectionError):
             return False

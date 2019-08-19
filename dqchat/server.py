@@ -11,7 +11,7 @@ class Server(Flask):
         self.add_url_rule("/verify", "verify", self.verify, methods=["POST"])
 
     def status(self):
-        return Response()
+        return Response("Online")
 
     def verify(self):
         token = request.form.get("token")

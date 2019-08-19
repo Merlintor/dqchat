@@ -2,7 +2,7 @@ from requests import Session, Timeout, ConnectionError
 
 
 class Client(Session):
-    def __init__(self, app, proxy_port=9050, scheme="http"):
+    def __init__(self, app, proxy_port=9150, scheme="http"):
         super().__init__()
         self.app = app
         self.scheme = scheme

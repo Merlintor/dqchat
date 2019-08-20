@@ -16,29 +16,25 @@ class Client(Session):
             "https": "socks5h://localhost:%s" % proxy_port
         }
 
-    def _get_shared_key(self, user_id):
-        if user_id in self.app.shared_keys.keys():
-            return self.app.shared_keys[user_id]
+    def generate_shared_key(self, user_id):
+        try:
+            resp = self.post("%s://%s.onion/key" % (self.scheme, user_id), timeout=10, data={
+                "user_id": self.app.user_id,
+                "token": self.app.diffieh.public_key
+            })
 
-        else:
-            try:
-                resp = self.post("%s://%s.onion/key" % (self.scheme, user_id), timeout=10, data={
-                    "user_id": self.app.user_id,
-                    "token": self.app.diffieh.public_key
-                })
+            if resp.status_code == 200:
+                shared_key = helpers.get_shared_key(self.app.diffieh, int(resp.text))
+                self.app.shared_keys[user_id] = shared_key
+                return True
 
-                if resp.status_code == 200:
-                    shared_key = helpers.get_shared_key(self.app.diffieh, int(resp.text))
-                    self.app.shared_keys[user_id] = shared_key
-                    return shared_key
-
-                else:
-                    return None
-            except (Timeout, ConnectionError):
-                return None
+            else:
+                return False
+        except (Timeout, ConnectionError):
+            return False
 
     def _encrypt_message(self, user_id, data: str):
-        shared_key = self._get_shared_key(user_id)
+        shared_key = self.app.shared_keys[user_id]
         if shared_key is None:
             return None
 

@@ -46,6 +46,15 @@ class App:
 
     def start_chat(self, user_id):
         self.active_chat = user_id
+        if user_id not in self.shared_keys.keys():
+            print("Exchanging keys ...")
+            result = self.client.generate_shared_key(user_id)
+            if not result:
+                print("Error exchanging keys, is the user online?")
+                return
+            else:
+                print("End to end encryption is setup.")
+
         if self.active_chat in self.chats.keys():
             for message in self.chats[self.active_chat]:
                 print(("> " if message["received"] else "") + message["content"])

@@ -1,6 +1,7 @@
 import secrets
 from threading import Thread
 import os
+from diffiehellman.diffiehellman import DiffieHellman
 
 from server import Server
 from client import Client
@@ -20,7 +21,9 @@ class App:
         self.chats = {}
         self.active_chat = None
 
-        self.run()
+        self.diffieh = DiffieHellman()
+        self.diffieh.generate_public_key()
+        self.shared_keys = {}
 
     def on_message(self, data):
         if not self.client.verify_message(data["author"], data["token"]):

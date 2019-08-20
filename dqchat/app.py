@@ -14,8 +14,8 @@ class App:
         self.client = Client(self)
         self.server = Server(self)
         self.tor = TorController()
-        self.user_id = None
 
+        self.user_id = None
         self.port = port
 
         self.chats = {}
@@ -77,4 +77,8 @@ class App:
         server_thread = Thread(target=self.server.run, kwargs={"port": self.port})
         server_thread.start()
         self.start_menu()
+
+    def cleanup(self):
+        print("cleanup")
+        self.tor.remove_service()
 

@@ -13,6 +13,7 @@ class App:
         self.client = Client(self)
         self.server = Server(self)
         self.tor = TorController()
+        self.user_id = None
 
         self.port = port
 
@@ -65,9 +66,8 @@ class App:
 
     def run(self):
         self.tor.create_service()
-        print(self.tor.get_hostname())
-
         self.user_id = self.tor.get_hostname().replace(".onion", "")
+        print("Your user id is", self.user_id)
         
         server_thread = Thread(target=self.server.run, kwargs={"port": self.port})
         server_thread.start()

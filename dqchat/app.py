@@ -22,8 +22,10 @@ class App:
 
         self.run()
 
-
     def on_message(self, data):
+        if not self.client.verify_message(data["author"], data["token"]):
+            return
+
         self.chats.setdefault(data["author"], [])
         self.chats[data["author"]].append({
             "content": data["content"],

@@ -1,11 +1,12 @@
 from requests import Session, Timeout, ConnectionError
-
+from friendlist import FriendList
 
 class Client(Session):
     def __init__(self, app, proxy_port=9150, scheme="http"):
         super().__init__()
         self.app = app
         self.scheme = scheme
+        self.friend_list = FriendList()
         self.proxies = {
             "http": "socks5h://localhost:%s" % proxy_port,
             "https": "socks5h://localhost:%s" % proxy_port

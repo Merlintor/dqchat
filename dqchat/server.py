@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify, Response
+import logging
 
 
 class Server(Flask):
@@ -9,6 +10,8 @@ class Server(Flask):
         self.add_url_rule("/status", "status", self.status, methods=["GET"])
         self.add_url_rule("/messages", "messages", self.messages, methods=["POST"])
         self.add_url_rule("/verify", "verify", self.verify, methods=["POST"])
+
+        logging.getLogger('werkzeug').setLevel(logging.ERROR)
 
     def status(self):
         return Response("Online")

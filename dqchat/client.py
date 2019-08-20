@@ -3,6 +3,8 @@ from cryptography.fernet import Fernet
 import json
 import base64
 
+import helpers
+
 
 class Client(Session):
     def __init__(self, app, proxy_port=9150, scheme="http"):
@@ -26,22 +28,21 @@ class Client(Session):
                 })
 
                 if resp.status_code == 200:
-                    self.app.diffieh.generate_shared_secret(int(resp.text), echo_return_key=True)
-                    shared_key = Fernet(base64.urlsafe_b64encode(bytes(self.app.diffieh.shared_key[:32], "utf-8")))
+                    shared_key = helpers.get_shared_key(self.app.diffieh, int(resp.text))
                     self.app.shared_keys[user_id] = shared_key
                     return shared_key
 
                 else:
                     return None
             except (Timeout, ConnectionError):
-                return None.de
+                return None
 
-    def _encrypt_message(self, user_id, data: dict):
+    def _encrypt_message(self, user_id, data: str):
         shared_key = self._get_shared_key(user_id)
         if shared_key is None:
             return None
 
-        return shared_key.encrypt(bytes(json.dumps(data), "utf-8"))
+        return shared_key.encrypt(bytes(data, "utf-8"))
 
     def get_status(self, user_id):
         try:

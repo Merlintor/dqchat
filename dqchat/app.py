@@ -73,7 +73,7 @@ class App:
         self.tor.create_service()
         self.user_id = self.tor.get_hostname().replace(".onion", "")
         print("Your user id is", self.user_id)
-        
+
         server_thread = Thread(target=self.server.run, kwargs={"port": self.port})
         server_thread.start()
         self.start_menu()

@@ -1,8 +1,9 @@
 from flask import Flask, request, jsonify, Response
 from cryptography.fernet import Fernet
 import logging
-import json
 import base64
+
+import helpers
 
 
 class Server(Flask):
@@ -21,10 +22,8 @@ class Server(Flask):
         return Response("Online")
 
     def key(self):
-        data = request.form
-
-        self.app.diffieh.generate_shared_secret(int(data["token"]), echo_return_key=True)
-        self.app.shared_keys[data["user_id"]] = Fernet(base64.urlsafe_b64encode(bytes(self.app.diffieh.shared_key[:32], "utf-8")))
+        shared_key = helpers.get_shared_key(self.app.diffieh, int(request.form["token"]))
+        self.app.shared_keys[request.form["user_id"]] = shared_key
         return Response(str(self.app.diffieh.public_key))
 
     def verify(self):
@@ -35,9 +34,7 @@ class Server(Flask):
         return Response(status=401)
 
     def messages(self):
-        data = dict(request.form)
-        print(data)
-        data["content"] = str(self.app.shared_keys[data["author"]].decrypt(bytes(data["content"], "utf-8")))
-        print(data)
+        data = request.form.to_dict()
+        data["content"] = self.app.shared_keys[data["author"]].decrypt(bytes(data["content"], "utf-8")).decode("utf-8")
         self.app.on_message(data)
         return Response()

@@ -15,10 +15,12 @@ class App:
         self.tor = TorController()
 
         self.port = port
-        self.user_id = self.tor.get_hostname().replace(".onion", "")
 
         self.chats = {}
         self.active_chat = None
+
+        self.run()
+
 
     def on_message(self, data):
         self.chats.setdefault(data["author"], [])
@@ -65,6 +67,8 @@ class App:
         self.tor.create_service()
         print(self.tor.get_hostname())
 
+        self.user_id = self.tor.get_hostname().replace(".onion", "")
+        
         server_thread = Thread(target=self.server.run, kwargs={"port": self.port})
         server_thread.start()
         self.start_menu()

@@ -34,9 +34,11 @@ class Server(Flask):
     def messages(self):
         data = request.form.to_dict()
         try:
-            data["content"] = self.app.shared_keys[data["author"]].decrypt(bytes(data["content"], "utf-8")).decode("utf-8")
+            data["content"] = self.app.shared_keys[data["author"]].decrypt(bytes(
+                data["content"], "utf-8")
+            ).decode("utf-8")
         except KeyError:
-            return Response("No shared token setup", status=400)
+            return Response("Invalid encryption. Regenerate tokens with '/regenerate'", status=400)
 
         self.app.on_message(data)
         return Response()

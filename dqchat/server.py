@@ -1,7 +1,5 @@
-from flask import Flask, request, jsonify, Response
-from cryptography.fernet import Fernet
+from flask import Flask, request, Response
 import logging
-import base64
 
 import helpers
 
@@ -35,6 +33,10 @@ class Server(Flask):
 
     def messages(self):
         data = request.form.to_dict()
-        data["content"] = self.app.shared_keys[data["author"]].decrypt(bytes(data["content"], "utf-8")).decode("utf-8")
+        try:
+            data["content"] = self.app.shared_keys[data["author"]].decrypt(bytes(data["content"], "utf-8")).decode("utf-8")
+        except KeyError:
+            return Response("No shared token setup", status=400)
+
         self.app.on_message(data)
         return Response()

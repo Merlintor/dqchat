@@ -58,6 +58,9 @@ class Client(Session):
                 "token": self.app.token,
                 "content": self._encrypt_message(user_id, content)
             })
+            if resp.status_code == 400:
+                print("Error: ", resp.text)
+
             return resp.status_code == 200
         except (Timeout, ConnectionError):
             return False

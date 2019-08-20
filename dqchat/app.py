@@ -136,12 +136,12 @@ class App:
             if (self.is_chatting):
                 user_in = input(self.resolve_name_of_active_chat(self.active_chat) + " < ")
                 
-                if (user_in[0] != "/"): # Send message if its not a command
+                if (len(user_in) > 0 and user_in[0] != "/"): # Send message if its not a command
                     self.send_message(user_in)
-                    self.recently_received_message = False
                 else:
                     self.cli_handler.handle(user_in)
-                    self.recently_received_message = False
+                
+                self.recently_received_message = False
             else:
                 user_in = input("$ ")
                 self.cli_handler.handle(user_in)

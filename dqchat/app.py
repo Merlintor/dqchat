@@ -119,9 +119,16 @@ class App:
         cli_handler.add_command("/clear", "clear --- Clear the console", self.clear_terminal, arg_count=0)
         cli_handler.add_command("/about", "about --- Display about text", self.about, arg_count=0)
         cli_handler.add_command("/exit", "exit --- Exit current chat to return the main menu", self.exit_chat, arg_count=0)
+
+        cli_handler.add_command("/me", "me --- Display your onion domain for other users", self.display_own_onion, arg_count=0)
+        cli_handler.add_command("/friends", "friends ---- Display the friendslist", self.client.friend_list.display_friends, arg_count=0)
+
         cli_handler.add_command("/help", "", cli_handler.print_all_commands, arg_count=1)
         return cli_handler
 
+    # /me und /friends
+    def display_own_onion(self):
+        print("Your onion domain is %s.onion" % self.user_id)
 
     def welcome(self):
         print("---------------------")
@@ -139,7 +146,6 @@ class App:
         self.tor.create_service()
         self.client.configure_proxies()
         self.user_id = self.tor.get_hostname().replace(".onion", "")
-        print("Your user id is", self.user_id)
 
         server_thread = Thread(target=self.server.run, kwargs={"port": self.port})
         server_thread.start()

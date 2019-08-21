@@ -63,3 +63,7 @@ class FriendList:
                 self._update_file()
                 return True
         print("Removed %s from the friend list. (%s)" % (name))
+
+    def display_friends(self):
+        for friend in self.friends:
+            print(friend["name"] + " - " + friend["onion"])

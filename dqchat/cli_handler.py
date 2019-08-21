@@ -16,7 +16,10 @@ class CLIHandler():
         for command in self.commands:
             if (command["name"] == cli_args[0]):
                 command_available = True
-                command["bind_func"](*cli_args[1:1+command["arg_count"]])
+                try:
+                    command["bind_func"](*cli_args[1:1+command["arg_count"]])
+                except:
+                    print("Inavlid command!")
         
         if (not command_available):
             print("Invalid command '" + cli_args[0] + "'")

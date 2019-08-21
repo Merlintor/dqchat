@@ -1,10 +1,7 @@
 from requests import Session, Timeout, ConnectionError
 
-from cryptography.fernet import Fernet
-import json
-import base64
-
-import helpers
+from utils import helpers
+from utils.logging import logger
 from friendlist import FriendList
 
 
@@ -60,11 +57,11 @@ class Client(Session):
                 "content": self._encrypt_message(user_id, content)
             })
             if resp.status_code == 400:
-                print("Error: ", resp.text)
+                logger.error(resp.text)
 
             return resp.status_code == 200
         except (Timeout, ConnectionError):
-            print("Connection Error")
+            logger.error("Sending message failed")
             return False
 
     def verify_message(self, user_id, token):
@@ -74,4 +71,5 @@ class Client(Session):
             })
             return resp.status_code == 200
         except (Timeout, ConnectionError):
+            logger.debug("Could not verfy author of received message")
             return False

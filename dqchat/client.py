@@ -44,14 +44,14 @@ class Client(Session):
 
     def get_status(self, user_id):
         try:
-            resp = self.get("%s://%s.onion/status" % (self.scheme, user_id), timeout=10)
+            resp = self.get("%s://%s.onion/status" % (self.scheme, user_id), timeout=30)
             return resp.status_code == 200
         except (Timeout, ConnectionError):
             return False
 
     def send_message(self, user_id, content):
         try:
-            resp = self.post("%s://%s.onion/messages" % (self.scheme, user_id), timeout=10, data={
+            resp = self.post("%s://%s.onion/messages" % (self.scheme, user_id), timeout=30, data={
                 "author": self.app.user_id,
                 "token": self.app.token,
                 "content": self._encrypt_message(user_id, content)
@@ -66,7 +66,7 @@ class Client(Session):
 
     def verify_message(self, user_id, token):
         try:
-            resp = self.post("%s://%s.onion/verify" % (self.scheme, user_id), timeout=10, data={
+            resp = self.post("%s://%s.onion/verify" % (self.scheme, user_id), timeout=30, data={
                 "token": token
             })
             return resp.status_code == 200

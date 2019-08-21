@@ -1,11 +1,11 @@
 import os
 import json
 
+
 class FriendList:
     def __init__(self):
-        self.path = "dqchat\\data\\friendlist.json"
+        self.path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data/friendlist.json")
         self.friends = self._load_friends_from_file()
-
 
     def _load_friends_from_file(self):
         try:

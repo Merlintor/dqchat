@@ -1,9 +1,11 @@
 from requests import Session, Timeout, ConnectionError
+
 from cryptography.fernet import Fernet
 import json
 import base64
 
 import helpers
+from friendlist import FriendList
 
 
 class Client(Session):
@@ -11,6 +13,7 @@ class Client(Session):
         super().__init__()
         self.app = app
         self.scheme = scheme
+        self.friend_list = FriendList()
         self.proxies = {
             "http": "socks5h://localhost:%s" % proxy_port,
             "https": "socks5h://localhost:%s" % proxy_port

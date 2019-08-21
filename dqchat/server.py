@@ -1,5 +1,7 @@
-from flask import Flask, request, jsonify, Response
+from flask import Flask, request, Response
 import logging
+
+import helpers
 
 
 class Server(Flask):
@@ -8,6 +10,7 @@ class Server(Flask):
         self.app = app
 
         self.add_url_rule("/status", "status", self.status, methods=["GET"])
+        self.add_url_rule("/key", "key", self.key, methods=["POST"])
         self.add_url_rule("/messages", "messages", self.messages, methods=["POST"])
         self.add_url_rule("/verify", "verify", self.verify, methods=["POST"])
 
@@ -15,6 +18,11 @@ class Server(Flask):
 
     def status(self):
         return Response("Online")
+
+    def key(self):
+        shared_key = helpers.get_shared_key(self.app.diffieh, int(request.form["token"]))
+        self.app.shared_keys[request.form["user_id"]] = shared_key
+        return Response(str(self.app.diffieh.public_key))
 
     def verify(self):
         token = request.form.get("token")
@@ -24,5 +32,13 @@ class Server(Flask):
         return Response(status=401)
 
     def messages(self):
-        self.app.on_message(request.form)
+        data = request.form.to_dict()
+        try:
+            data["content"] = self.app.shared_keys[data["author"]].decrypt(bytes(
+                data["content"], "utf-8")
+            ).decode("utf-8")
+        except KeyError:
+            return Response("Invalid encryption. Regenerate tokens with '/regenerate'", status=400)
+
+        self.app.on_message(data)
         return Response()

@@ -1,6 +1,7 @@
 import secrets
 from threading import Thread
 import os
+from diffiehellman.diffiehellman import DiffieHellman
 
 from server import Server
 from client import Client
@@ -14,9 +15,14 @@ class App:
         self.server = Server(self)
         self.port = port
         self.tor = TorController()
+        
         self.user_id = None
         self.recently_received_message = False # To prevent gap between two recevied messages, since every first incoming message after sending one prints an empty row
         self.is_chatting = False
+        
+        self.diffieh = DiffieHellman()
+        self.diffieh.generate_public_key()
+        self.shared_keys = {}
         
         self.chats = {}
         self.active_chat = None
@@ -34,7 +40,6 @@ class App:
         
         self.client.friend_list.add_friend(name, self.active_chat + ".onion")
     
-
     def on_message(self, data):
         if not self.client.verify_message(data["author"], data["token"]):
             return
@@ -77,9 +82,18 @@ class App:
             return
 
         self.active_chat = user_id
+        
+        if user_id not in self.shared_keys.keys():
+            print("Exchanging keys ...")
+            result = self.client.generate_shared_key(user_id)
+            if not result:
+                print("Error exchanging keys, is the user online?")
+                return
+            else:
+                print("End to end encryption is setup.")
+                
         self.is_chatting = True
 
-        # Display older messages
         if self.active_chat in self.chats.keys():
             for message in self.chats[self.active_chat]:
                 print(self.resolve_name_of_active_chat(user_id) + (" > " if message["received"] else " < ") + message["content"])
@@ -146,3 +160,4 @@ class App:
                 user_in = input("$ ")
                 self.cli_handler.handle(user_in)
                 self.recently_received_message = False
+

@@ -1,4 +1,4 @@
-requests
-flask
+requests==2.21.0
+flask==1.1.1
 stem
 pysocks

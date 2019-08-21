@@ -9,15 +9,17 @@ from friendlist import FriendList
 
 
 class Client(Session):
-    def __init__(self, app, proxy_port=9150, scheme="http"):
+    def __init__(self, app, scheme="http"):
         super().__init__()
         self.app = app
         self.scheme = scheme
+        
         self.friend_list = FriendList()
-        self.proxies = {
-            "http": "socks5h://localhost:%s" % proxy_port,
-            "https": "socks5h://localhost:%s" % proxy_port
-        }
+        self.proxies = {}
+
+    def configure_proxies(self):
+        self.proxies["http"] = "socks5h://localhost:%s" % self.app.tor.socks_port
+        self.proxies["https"] = "socks5h://localhost:%s" % self.app.tor.socks_port
 
     def generate_shared_key(self, user_id):
         try:
@@ -62,6 +64,7 @@ class Client(Session):
 
             return resp.status_code == 200
         except (Timeout, ConnectionError):
+            print("Connection Error")
             return False
 
     def verify_message(self, user_id, token):

@@ -67,7 +67,6 @@ class App:
 
     def start_chat(self, user_id):
         self.clear_terminal()
-        
         if (".onion" not in user_id): # Get onion from username
             try:
                 user_id = self.client.friend_list.get_onion_by_name(user_id).split(".")[0]
@@ -76,6 +75,8 @@ class App:
                 return
         else:
             user_id = user_id.split(".")[0]
+
+        print("Trying to connect to %s (%s)" % (self.resolve_name_of_active_chat(user_id), user_id))
 
         if self.client.get_status(user_id): # receiver online
             print("%s (%s) is currently online!" % (self.resolve_name_of_active_chat(user_id), user_id))

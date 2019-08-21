@@ -11,10 +11,11 @@ from cli_handler import CLIHandler
 class App:
     def __init__(self, port=31213):
         self.token = secrets.token_hex()
+        self.tor = TorController()
         self.client = Client(self)
         self.server = Server(self)
+        
         self.port = port
-        self.tor = TorController()
         
         self.user_id = None
         self.recently_received_message = False # To prevent gap between two recevied messages, since every first incoming message after sending one prints an empty row
@@ -133,7 +134,10 @@ class App:
         print()
 
     def run(self):
+        self.tor.run_tor()
+        self.tor.connect()
         self.tor.create_service()
+        self.client.configure_proxies()
         self.user_id = self.tor.get_hostname().replace(".onion", "")
         print("Your user id is", self.user_id + ".onion")
 

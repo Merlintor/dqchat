@@ -2,6 +2,7 @@ from stem.control import Controller
 from stem.process import launch_tor_with_config
 import os
 import re
+from utils.logging import logger
 
 
 class TorController:
@@ -25,18 +26,21 @@ class TorController:
             return os.path.join(os.path.dirname(os.path.abspath(__file__)), "tor\\executables\\linux\\tor")
 
     def run_tor(self):
-        print("Starting tor ...")
+        logger.info("Starting tor...")
         socks_pattern = re.compile(r"Socks listener listening on port (?P<port>[0-9]+).$")
         control_pattern = re.compile(r"Control listener listening on port (?P<port>[0-9]+).$")
 
         def get_ports(log_text):
+            logger.debug(log_text)
             socks_match = socks_pattern.search(log_text)
             if socks_match is not None:
                 self.socks_port = int(socks_match.group("port"))
+                logger.info("Using Socks Port %s" %self.socks_port)
 
             control_match = control_pattern.search(log_text)
             if control_match is not None:
                 self.control_port = int(control_match.group("port"))
+                logger.info("Using Control Port %s" % self.control_port)
 
         self.process = launch_tor_with_config({
             "DataDirectory": os.path.join(os.path.dirname(os.path.abspath(__file__)), "tor\\data"),
@@ -51,11 +55,12 @@ class TorController:
         )
 
     def connect(self):
-        print("Connecting to tor ...")
+        logger.debug("Connecting to Control Port...")
         self.controller = Controller.from_port(port=self.control_port)
         self.controller.authenticate()
 
     def create_service(self):
+        logger.debug("Creating hidden service...")
         return self.controller.create_hidden_service(
             self.hidden_service_dir,
             80,
@@ -63,6 +68,7 @@ class TorController:
         )
 
     def remove_service(self):
+        logger.debug("Removing hidden service")
         return self.controller.remove_hidden_service(self.hidden_service_dir)
 
     def get_hostname(self):
@@ -73,4 +79,5 @@ class TorController:
             return None
 
     def close(self):
+        logger.debug("Closing Control Port connection")
         self.controller.close()

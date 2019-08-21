@@ -1,7 +1,8 @@
 from flask import Flask, request, Response
 import logging
 
-import helpers
+from utils import helpers
+from utils.logging import logger
 
 
 class Server(Flask):
@@ -29,6 +30,7 @@ class Server(Flask):
         if token == self.app.token:
             return Response()
 
+        logger.debug("Received invalid verification request")
         return Response(status=401)
 
     def messages(self):

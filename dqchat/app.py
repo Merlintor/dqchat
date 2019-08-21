@@ -8,6 +8,7 @@ from client import Client
 from tor import TorController
 from cli_handler import CLIHandler
 
+
 class App:
     def __init__(self, port=31213):
         self.token = secrets.token_hex()
@@ -121,7 +122,6 @@ class App:
         cli_handler.add_command("/exit", "exit --- Exit current chat to return the main menu", self.exit_chat, arg_count=0)
         cli_handler.add_command("/help", "", cli_handler.print_all_commands, arg_count=1)
         return cli_handler
-
 
     def welcome(self):
         print("---------------------")

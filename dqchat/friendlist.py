@@ -3,7 +3,7 @@ import json
 
 class FriendList:
     def __init__(self):
-        self.path = "friendlist.json"
+        self.path = "dqchat\\data\\friendlist.json"
         self.friends = self._load_friends_from_file()
 
 
@@ -28,8 +28,7 @@ class FriendList:
         with open(self.path, "w") as fl_file:
             json_data = {}
             for i in range(len(self.friends)):
-                for friend in self.friends:
-                    json_data[str(i)] = {"name": friend["name"], "onion": friend["onion"]}
+                    json_data[str(i)] = {"name": self.friends[i]["name"], "onion": self.friends[i]["onion"]}
             json.dump(json_data, fl_file)
 
 
@@ -54,6 +53,7 @@ class FriendList:
         json_object = {"name": name, "onion": onion}
         self.friends.append(json_object)
         self._update_file()
+        print("Added %s to the friend list. (%s)" % (name, onion))
         return True
     
     def remove_friend(self, name):
@@ -62,4 +62,4 @@ class FriendList:
                 self.friends.remove(friend)
                 self._update_file()
                 return True
-        return False
+        print("Removed %s from the friend list. (%s)" % (name))

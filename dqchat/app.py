@@ -10,9 +10,9 @@ from tor import TorController
 class App:
     def __init__(self, port=31213):
         self.token = secrets.token_hex()
+        self.tor = TorController()
         self.client = Client(self)
         self.server = Server(self)
-        self.tor = TorController()
         self.user_id = None
 
         self.port = port
@@ -67,7 +67,10 @@ class App:
             self.start_chat(user_id.replace(".onion", ""))
 
     def run(self):
+        self.tor.run_tor()
+        self.tor.connect()
         self.tor.create_service()
+        self.client.configure_proxies()
         self.user_id = self.tor.get_hostname().replace(".onion", "")
         print("Your user id is", self.user_id)
         

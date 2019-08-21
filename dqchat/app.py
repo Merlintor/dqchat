@@ -132,11 +132,10 @@ class App:
 
     def welcome(self):
         print("---------------------")
-        print("| Welcome to DQ-TOR |")
+        print("| Welcome to DQ-CHAT |")
         print("---------------------")
 
     def about(self):
-        print("About Placeholder! Pack dein ASCII Art hier rein Schmeffken ;)")
         print("For help use the /help command!")
         print()
 
